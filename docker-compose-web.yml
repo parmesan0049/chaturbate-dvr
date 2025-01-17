@@ -5,7 +5,7 @@ services:
     container_name: chaturbate-dvr-web
     build:
       context: .
-      dockerfile: web.Dockerfile
+      dockerfile: Dockerfile.web
     environment:
       - GUI_USERNAME=johndoe
       - GUI_PASSWORD=password
