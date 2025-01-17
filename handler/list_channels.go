@@ -67,6 +67,11 @@ func (h *ListChannelsHandler) Handle(c *gin.Context) {
 		return
 	}
 
+	// Sort by channel name, alphabetically
+	sort.SliceStable(channels, func(i, j int) bool {
+		return channels[i].Username < channels[j].Username
+	})
+
 	// Sort by IsOnline: online channels first, then offline
 	sort.SliceStable(channels, func(i, j int) bool {
 		return channels[i].IsOnline && !channels[j].IsOnline
