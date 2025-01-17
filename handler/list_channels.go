@@ -33,6 +33,8 @@ type ListChannelsResponseChannel struct {
 	IsOnline        bool     `json:"is_online"`
 	IsPaused        bool     `json:"is_paused"`
 	Logs            []string `json:"logs"`
+	Resolution      int      `json:"resolution"`
+	Framerate       int      `json:"framerate"`
 }
 
 //=======================================================
@@ -95,6 +97,8 @@ func (h *ListChannelsHandler) Handle(c *gin.Context) {
 			IsOnline:        channel.IsOnline,
 			IsPaused:        channel.IsPaused,
 			Logs:            channel.Logs,
+			Resolution:      channel.Resolution,
+			Framerate:       channel.Framerate,
 		}
 	}
 
