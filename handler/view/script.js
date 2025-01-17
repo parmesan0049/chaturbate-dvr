@@ -1,10 +1,12 @@
 function data() {
   return {
     settings: {},
+    channels_all: [],
     channels: [],
     currentPage: 1,
     itemsPerPage: 5,
     is_updating_channels: false,
+    recording_filter: "ALL",
     form_data: {
       username: "",
       resolution: "1080",
@@ -21,6 +23,15 @@ function data() {
       this.$watch("settings.log_level", async (newVal, oldVal) => {
         if (newVal !== oldVal) {
           await this.updateLogLevel();
+        }
+      });
+    },
+
+    // Watch for changes in recording_filter
+    watchRecordingFilter() {
+      this.$watch("recording_filter", (newVal, oldVal) => {
+        if (newVal !== oldVal) {
+          this.listChannels();
         }
       });
     },
@@ -100,6 +111,7 @@ function data() {
 
       await this.getSettings(); // Ensure settings are loaded
       this.watchLogLevel(); // Start watching LogLevel after settings load
+      this.watchRecordingFilter(); // Start watching recording_filter
       await this.listChannels();
       this.listenUpdate();
     },
@@ -152,7 +164,7 @@ function data() {
       }
       var [_, err] = await this.call("delete_channel", { username });
       if (!err) {
-        this.channels = this.channels.filter((ch) => ch.username !== username);
+        this.channels_all = this.channels_all.filter((ch) => ch.username !== username);
       }
     },
 
@@ -181,11 +193,21 @@ function data() {
       }
       var [resp, err] = await this.call("list_channels", {});
       if (!err) {
-        this.channels = resp.channels;
+        this.channels_all = resp.channels;
         this.currentPage = 1;
-        this.channels.forEach((ch) => {
+        this.channels_all.forEach((ch) => {
           this.scrollLogs(ch.username);
         });
+        // Filter channels based on recording_filter
+        if (this.recording_filter === "RECORDING") {
+          this.channels = this.channels_all.filter(channel => channel.is_online && !channel.is_paused);
+        } else if (this.recording_filter === "PAUSED") {
+          this.channels = this.channels_all.filter(channel => channel.is_paused);
+        } else if (this.recording_filter === "OFFLINE") {
+          this.channels = this.channels_all.filter(channel => !channel.is_online && !channel.is_paused);
+        } else {
+          this.channels = this.channels_all;
+        }
       }
       this.is_updating_channels = false;
     },
@@ -198,27 +220,27 @@ function data() {
         var data = JSON.parse(event.data);
 
         // If the channel is not in the list or is stopped, refresh the list.
-        if (!this.channels.some((ch) => ch.username === data.username) || data.is_stopped) {
+        if (!this.channels_all.some((ch) => ch.username === data.username) || data.is_stopped) {
           this.listChannels();
           return;
         }
 
-        var index = this.channels.findIndex((ch) => ch.username === data.username);
+        var index = this.channels_all.findIndex((ch) => ch.username === data.username);
 
         if (index === -1) {
           return;
         }
 
-        this.channels[index].segment_duration = data.segment_duration;
-        this.channels[index].segment_filesize = data.segment_filesize;
-        this.channels[index].filename = data.filename;
-        this.channels[index].last_streamed_at = data.last_streamed_at;
-        this.channels[index].is_online = data.is_online;
-        this.channels[index].is_paused = data.is_paused;
-        this.channels[index].logs = [...this.channels[index].logs, data.log];
+        this.channels_all[index].segment_duration = data.segment_duration;
+        this.channels_all[index].segment_filesize = data.segment_filesize;
+        this.channels_all[index].filename = data.filename;
+        this.channels_all[index].last_streamed_at = data.last_streamed_at;
+        this.channels_all[index].is_online = data.is_online;
+        this.channels_all[index].is_paused = data.is_paused;
+        this.channels_all[index].logs = [...this.channels_all[index].logs, data.log];
 
-        if (this.channels[index].logs.length > 100) {
-          this.channels[index].logs = this.channels[index].logs.slice(-100);
+        if (this.channels_all[index].logs.length > 100) {
+          this.channels_all[index].logs = this.channels_all[index].logs.slice(-100);
         }
 
         this.scrollLogs(data.username);
@@ -231,7 +253,7 @@ function data() {
 
     downloadLogs(username) {
       var a = window.document.createElement("a");
-      a.href = window.URL.createObjectURL(new Blob([this.channels[this.channels.findIndex((ch) => ch.username === username)].logs.join("\n")], { type: "text/plain", oneTimeOnly: true }));
+      a.href = window.URL.createObjectURL(new Blob([this.channels_all[this.channels_all.findIndex((ch) => ch.username === username)].logs.join("\n")], { type: "text/plain", oneTimeOnly: true }));
       a.download = `${username}_logs.txt`;
       document.body.appendChild(a);
       a.click();
