@@ -31,19 +31,31 @@ const logo = `
 func main() {
 	app := &cli.App{
 		Name:    "chaturbate-dvr",
-		Version: "1.0.0",
+		Version: "1.0.6",
 		Usage:   "Records your favorite Chaturbate stream 😎🫵",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "username",
 				Aliases: []string{"u"},
-				Usage:   "channel username to record.",
+				Usage:   "channel username to record",
+				Value:   "",
+			},
+			&cli.StringFlag{
+				Name:    "gui-username",
+				Aliases: []string{"gui-u"},
+				Usage:   "username for auth web (optional)",
+				Value:   "",
+			},
+			&cli.StringFlag{
+				Name:    "gui-password",
+				Aliases: []string{"gui-p"},
+				Usage:   "password for auth web (optional)",
 				Value:   "",
 			},
 			&cli.IntFlag{
 				Name:    "framerate",
 				Aliases: []string{"f"},
-				Usage:   "preferred framerate.",
+				Usage:   "preferred framerate",
 				Value:   30,
 			},
 			&cli.IntFlag{
@@ -86,6 +98,12 @@ func main() {
 				Usage: "port to expose the web interface and API",
 				Value: "8080",
 			},
+			&cli.IntFlag{
+				Name:    "interval",
+				Aliases: []string{"i"},
+				Usage:   "minutes to check if the channel is online",
+				Value:   1,
+			},
 			//&cli.StringFlag{
 			//	Name:  "gui",
 			//	Usage: "enabling GUI, availables: 'no', 'web'",
@@ -116,6 +134,7 @@ func start(c *cli.Context) error {
 		FilenamePattern:    c.String("filename-pattern"),
 		SplitDuration:      c.Int("split-duration"),
 		SplitFilesize:      c.Int("split-filesize"),
+		Interval:           c.Int("interval"),
 	}); err != nil {
 		return err
 	}
@@ -132,23 +151,41 @@ func startWeb(c *cli.Context) error {
 
 	//r.Use(cors.Default())
 	m := chaturbate.NewManager(c)
+	if err := m.LoadChannels(); err != nil {
+		return err
+	}
 
 	fe, err := fs.Sub(FS, "handler/view")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	r.StaticFS("/static", http.FS(fe))
-	r.StaticFileFS("/", "/", http.FS(fe))
 
-	r.POST("/api/get_channel", handler.NewGetChannelHandler(m, c).Handle)
-	r.POST("/api/create_channel", handler.NewCreateChannelHandler(m, c).Handle)
-	r.POST("/api/list_channels", handler.NewListChannelsHandler(m, c).Handle)
-	r.POST("/api/delete_channel", handler.NewDeleteChannelHandler(m, c).Handle)
-	r.POST("/api/pause_channel", handler.NewPauseChannelHandler(m, c).Handle)
-	r.POST("/api/resume_channel", handler.NewResumeChannelHandler(m, c).Handle)
-	r.GET("/api/listen_update", handler.NewListenUpdateHandler(m, c).Handle)
-	r.POST("/api/get_settings", handler.NewGetSettingsHandler(c).Handle)
-	r.POST("/api/terminate_program", handler.NewTerminateProgramHandler(c).Handle)
+	guiUsername := c.String("gui-username")
+	guiPassword := c.String("gui-password")
+
+	var authorized = r.Group("/")
+	var authorizedApi = r.Group("/api")
+
+	if guiUsername != "" && guiPassword != "" {
+		ginBasicAuth := gin.BasicAuth(gin.Accounts{
+			guiUsername: guiPassword,
+		})
+		authorized.Use(ginBasicAuth)
+		authorizedApi.Use(ginBasicAuth)
+	}
+
+	authorized.StaticFS("/static", http.FS(fe))
+	authorized.StaticFileFS("/", "/", http.FS(fe))
+
+	authorizedApi.POST("/get_channel", handler.NewGetChannelHandler(m, c).Handle)
+	authorizedApi.POST("/create_channel", handler.NewCreateChannelHandler(m, c).Handle)
+	authorizedApi.POST("/list_channels", handler.NewListChannelsHandler(m, c).Handle)
+	authorizedApi.POST("/delete_channel", handler.NewDeleteChannelHandler(m, c).Handle)
+	authorizedApi.POST("/pause_channel", handler.NewPauseChannelHandler(m, c).Handle)
+	authorizedApi.POST("/resume_channel", handler.NewResumeChannelHandler(m, c).Handle)
+	authorizedApi.GET("/listen_update", handler.NewListenUpdateHandler(m, c).Handle)
+	authorizedApi.POST("/get_settings", handler.NewGetSettingsHandler(c).Handle)
+	authorizedApi.POST("/terminate_program", handler.NewTerminateProgramHandler(c).Handle)
 
 	fmt.Printf("👋 Visit http://localhost:%s to use the Web UI\n", c.String("port"))
 

@@ -10,7 +10,7 @@ For Chaturbate-**only**, private/ticket stream is **unsupported**.
 
 ## Usage
 
-Download **`source code (zip)`** from **[Release](https://github.com/teacat/chaturbate-dvr/releases)** page. Unzip **`/bin`** folder and look up for executable that **fits your system**.
+Download executable from **[Release](https://github.com/teacat/chaturbate-dvr/releases)** page (e.g., `windows_chatubrate-dvr.exe`).
 
 &nbsp;
 
@@ -94,8 +94,11 @@ COMMANDS:
    help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --username value, -u value               channel username to record.
-   --framerate value, -f value              preferred framerate. (default: 30)
+   --username value, -u value               channel username to record
+   --gui-username value, --gui-u value      username for auth web (optional)
+   --gui-password value, --gui-p value      password for auth web (optional)
+   --framerate value, -f value              preferred framerate (default: 30)
+   --interval value, -i value               minutes to check if the channel is online (default: 1)
    --resolution value, -r value             preferred resolution (default: 1080)
    --resolution-fallback value, --rf value  fallback to 'up' (larger) or 'down' (smaller) resolution if preferred resolution is not available (default: "down")
    --filename-pattern value, --fp value     filename pattern for videos (default: "videos/{{.Username}}_{{.Year}}-{{.Month}}-{{.Day}}_{{.Hour}}-{{.Minute}}-{{.Second}}{{if .Sequence}}_{{.Sequence}}{{end}}")
@@ -175,6 +178,34 @@ Pattern: video/{{.Username}}/{{.Year}}-{{.Month}}-{{.Day}}_{{.Hour}}-{{.Minute}}
 ```
 
 ※ The file will be saved as `.ts` format and it's not configurable.
+
+&nbsp;
+
+## 🤔 Frequently Asked Questions
+
+**Q: The program closes itself when I just open it on Windows**
+
+A: Try to open the program in **Command Prompt**, the error message should appear, and create a new [Issue](https://github.com/teacat/chaturbate-dvr/issues) for it.
+
+&nbsp;
+
+**Q: Channel is online but the program says it's Offline**
+
+A: The program might be blocked by Chaturbate or Cloudflare. If the Channel is in a private/ticket show, the program doesn't support it yet.
+
+&nbsp;
+
+**Q: `listen tcp :8080: bind: An attempt was made to access a socket in a way forbidden by its access permissions.`**
+
+A: The port `8080` is already in use, change the port with `-port` option (e.g. `-port 8123`) and visit `http://localhost:8123`.
+
+If the error still occur, run **Command Prompt** as Administrator, and type `net stop winnat` then `net start winnat`, and re-run the Chaturbate DVR again.
+
+&nbsp;
+
+**Q: `A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.`**
+
+A: Your network is unstable or being blocked by Chaturbate, the program can't help with the network issue. Usually happened when you are using VPN or Proxy.
 
 &nbsp;
 

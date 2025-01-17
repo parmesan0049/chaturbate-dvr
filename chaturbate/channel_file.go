@@ -56,8 +56,33 @@ func (w *Channel) newFile() error {
 	return nil
 }
 
+// releaseFile
+func (w *Channel) releaseFile() error {
+	if w.file == nil {
+		return nil
+	}
+	// close the file to remove it
+	if err := w.file.Close(); err != nil {
+		return fmt.Errorf("close file: %s: %w", w.file.Name(), err)
+	}
+	// remove it if it was empty
+	if w.SegmentFilesize == 0 {
+		w.log(logTypeInfo, "%s was removed because it was empty", w.file.Name())
+
+		if err := os.Remove(w.file.Name()); err != nil {
+			return fmt.Errorf("remove zero file: %s: %w", w.file.Name(), err)
+		}
+	}
+	w.file = nil
+	return nil
+}
+
 // nextFile
 func (w *Channel) nextFile() error {
+	if err := w.releaseFile(); err != nil {
+		w.log(logTypeError, "release file: %w", err)
+	}
+
 	w.splitIndex++
 	w.SegmentFilesize = 0
 	w.SegmentDuration = 0
