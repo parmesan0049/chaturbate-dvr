@@ -7,6 +7,7 @@ function data() {
     itemsPerPage: 5,
     is_updating_channels: false,
     recording_filter: "ALL",
+    search_query: "",
     form_data: {
       username: "",
       resolution: "1080",
@@ -30,6 +31,15 @@ function data() {
     // Watch for changes in recording_filter
     watchRecordingFilter() {
       this.$watch("recording_filter", (newVal, oldVal) => {
+        if (newVal !== oldVal) {
+          this.listChannels();
+        }
+      });
+    },
+
+    // Watch for changes in search_query
+    watchSearchQuery() {
+      this.$watch("search_query", (newVal, oldVal) => {
         if (newVal !== oldVal) {
           this.listChannels();
         }
@@ -112,6 +122,7 @@ function data() {
       await this.getSettings(); // Ensure settings are loaded
       this.watchLogLevel(); // Start watching LogLevel after settings load
       this.watchRecordingFilter(); // Start watching recording_filter
+      this.watchSearchQuery(); // Start watching search_query
       await this.listChannels();
       this.listenUpdate();
     },
@@ -198,6 +209,7 @@ function data() {
         this.channels_all.forEach((ch) => {
           this.scrollLogs(ch.username);
         });
+
         // Filter channels based on recording_filter
         if (this.recording_filter === "RECORDING") {
           this.channels = this.channels_all.filter(channel => channel.is_online && !channel.is_paused);
@@ -207,6 +219,10 @@ function data() {
           this.channels = this.channels_all.filter(channel => !channel.is_online && !channel.is_paused);
         } else {
           this.channels = this.channels_all;
+        }
+        // Filter channels based on search_query
+        if (this.search_query !== "") {
+          this.channels = this.channels.filter(channel => channel.username.toLowerCase().includes(this.search_query.toLowerCase()));
         }
       }
       this.is_updating_channels = false;

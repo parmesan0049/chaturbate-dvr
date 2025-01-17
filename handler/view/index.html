@@ -210,7 +210,7 @@
     <!-- / Header -->
 
     <!-- Empty State -->
-    <template x-if="channels.length === 0">
+    <template x-if="channels_all.length === 0">
       <div>
         <div class="ts-divider has-vertically-spaced-large"></div>
         <div class="ts-blankslate">
@@ -228,8 +228,8 @@
     </template>
     <!-- / Empty State -->
 
-    <!-- Divider -->
-    <template x-if="channels.length > 0">
+    <!-- Recording State Filter -->
+    <template x-if="channels_all.length > 0">
       <div class="ts-divider is-center-text is-section">
         <div class="column">
           <div class="ts-wrap is-center-aligned">
@@ -264,17 +264,31 @@
         </div>
       </div>
     </template>
-    <!-- / Divider -->
+    <!-- / Recording State Filter -->
+
+    <!-- Search Bar -->
+    <div class="ts-grid is-end-aligned">
+      <div class="column is-4-wide">
+        <div class="ts-input">
+          <input type="text" placeholder="Search" x-model="search_query" />
+        </div>
+      </div>
+    </div>
+    <!-- / Search Bar -->
+
     <!-- Pagination Controls -->
-    <div class="ts-pagination is-fluid" style="margin-bottom: 1rem;">
-      <a class="item" x-on:click="goToPage(1)" :class="{ 'is-disabled': currentPage === 1 }">&laquo;</a>
-      <template x-for="page in totalPages" :key="page">
-        <a class="item" x-on:click="goToPage(page)" :class="{ 'is-active': currentPage === page }" x-text="page"></a>
-      </template>
-      <a class="item" x-on:click="goToPage(totalPages)"
-        :class="{ 'is-disabled': currentPage === totalPages }">&raquo;</a>
+    <div class="ts-wrap is-center-aligned">
+      <div class="ts-pagination has-bottom-spaced">
+        <a class="item is-first" x-on:click="goToPage(1)" :class="{ 'is-disabled': currentPage === 1 }">First</a>
+        <template x-for="page in totalPages" :key="page">
+          <a class="item" x-on:click="goToPage(page)" :class="{ 'is-active': currentPage === page }" x-text="page"></a>
+        </template>
+        <a class="item is-last" x-on:click="goToPage(totalPages)"
+          :class="{ 'is-disabled': currentPage === totalPages }">Last</a>
+      </div>
     </div>
     <!-- / Pagination controls -->
+
     <div class="ts-wrap is-vertical is-relaxed">
       <!-- Channel -->
       <template x-for="channel in paginatedChannels" :key="channel.username">
