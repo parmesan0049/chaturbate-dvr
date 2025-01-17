@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -235,8 +236,18 @@ func (w *Channel) mergeSegments() {
 		lens, err := w.file.Write(buf)
 		if err != nil {
 			w.log(LogTypeError, "segment #%d written error: %v", w.bufferIndex, err)
-			w.retries++
-			continue
+			debug.PrintStack()
+			// w.retries++
+			// continue
+
+			// an error occurred while writing the segment to the file, restarting the channel recording to a new file
+			w.log(LogTypeInfo, "creating new file")
+			if err := w.nextFile(startTime); err != nil {
+				w.log(LogTypeError, "next file error: %v", err)
+				break
+			}
+
+			startTime = time.Now() // Reset start time for the new segment.
 		}
 
 		// Update segment size and log progress.
