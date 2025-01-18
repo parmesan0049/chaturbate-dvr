@@ -189,6 +189,14 @@
       <div class="column">
         <div class="ts-wrap">
           <div class="ts-select">
+            <select x-model="itemsPerPage">
+              <option>5</option>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select>
+          </div>
+          <div class="ts-select">
             <select x-model="settings.log_level">
               <option>DEBUG</option>
               <option>INFO</option>
