@@ -33,4 +33,4 @@ jobs:
         with:
           file: ./Dockerfile.web
           push: true
-          tags: parmesan0049/chaturbate-dvr-web:latest
+          tags: ghcr.io/parmesan0049/chaturbate-dvr-web:latest
