@@ -275,27 +275,34 @@
     <!-- / Recording State Filter -->
 
     <!-- Search Bar -->
-    <div class="ts-grid is-end-aligned">
-      <div class="column is-4-wide">
-        <div class="ts-input">
-          <input type="text" placeholder="Search" x-model="search_query" />
+    <template x-if="channels_all.length > 0">
+      <div class="ts-grid is-end-aligned">
+        <div class="column is-4-wide">
+          <div class="ts-input">
+            <input type="text" placeholder="Search" x-model="search_query" />
+          </div>
         </div>
       </div>
-    </div>
+    </template>
     <!-- / Search Bar -->
 
     <!-- Pagination Controls -->
-    <div class="ts-wrap is-center-aligned">
-      <div class="ts-pagination has-bottom-spaced">
-        <a class="item is-first" x-on:click="goToPage(1)" :class="{ 'is-disabled': currentPage === 1 }">First</a>
-        <template x-for="page in totalPages" :key="page">
-          <a class="item" x-on:click="goToPage(page)" :class="{ 'is-active': currentPage === page }" x-text="page"></a>
-        </template>
-        <a class="item is-last" x-on:click="goToPage(totalPages)"
-          :class="{ 'is-disabled': currentPage === totalPages }">Last</a>
+    <template x-if="channels_all.length > 0">
+      <div class="ts-wrap is-center-aligned">
+        <div class="ts-pagination has-bottom-spaced">
+          <a class="item is-first" x-on:click="goToPage(1)" :class="{ 'is-disabled': currentPage === 1 }">First</a>
+          <template x-for="page in totalPages" :key="page">
+            <a class="item" x-on:click="goToPage(page)" :class="{ 'is-active': currentPage === page }"
+              x-text="page"></a>
+          </template>
+          <a class="item is-last" x-on:click="goToPage(totalPages)"
+            :class="{ 'is-disabled': currentPage === totalPages }">Last</a>
+        </div>
       </div>
-    </div>
+    </template>
     <!-- / Pagination controls -->
+
+    <!-- TODO: Add "Sort by": name, last streamed at, resolution-->
 
     <div class="ts-wrap is-vertical is-relaxed">
       <!-- Channel -->
