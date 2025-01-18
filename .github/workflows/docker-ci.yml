@@ -5,6 +5,11 @@ on:
     branches:
       - dev
       - master
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - "master"
 
 jobs:
   docker:
@@ -21,16 +26,26 @@ jobs:
       #   uses: docker/setup-qemu-action@v3
       # - name: Checkout
       #   uses: actions/checkout@v4
-      # - name: Extract Docker image metadata
-      #   id: meta
-      #   uses: docker/metadata-action@v5
-      #   with:
-      #     images: ${{ vars.DOCKER_USERNAME }}/my-image
+      - name: Extract Docker image metadata (distroless image)
+        id: meta-distroless
+        uses: docker/metadata-action@v5
+        with:
+          flavor: |
+            latest=auto
+            prefix=distroless
+          images: ghcr.io/parmesan0049/chaturbate-dvr-web
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Build and push
+      # - name: Build and push chaturbate-dvr-web (debian)
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     file: ./Dockerfile.web
+      #     push: true
+      #     tags: ghcr.io/parmesan0049/chaturbate-dvr-web:latest
+      - name: Build and push chaturbate-dvr-web (distroless image)
         uses: docker/build-push-action@v6
         with:
-          file: ./Dockerfile.web
-          push: true
-          tags: ghcr.io/parmesan0049/chaturbate-dvr-web:latest
+          file: ./Dockerfile.distroless
+          labels: ${{ steps.meta-distroless.outputs.labels }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta-distroless.outputs.tags }}
