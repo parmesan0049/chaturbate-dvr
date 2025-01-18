@@ -1,0 +1,16 @@
+FROM golang:latest as base
+
+WORKDIR /usr/src/app
+
+COPY . .
+RUN go mod download && go mod verify
+RUN CGO_ENABLED=0 go build -o /chaturbate-dvr .
+
+FROM gcr.io/distroless/static-debian12
+
+WORKDIR /usr/src/app
+
+COPY --from=base /chaturbate-dvr .
+
+EXPOSE 8080/tcp
+ENTRYPOINT [ "./chaturbate-dvr" ]
