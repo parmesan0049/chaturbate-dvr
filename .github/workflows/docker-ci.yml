@@ -32,7 +32,7 @@ jobs:
         with:
           flavor: |
             latest=auto
-            prefix=distroless
+            prefix=distroless-
           images: ghcr.io/parmesan0049/chaturbate-dvr-web
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
