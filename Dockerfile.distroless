@@ -1,12 +1,19 @@
-FROM golang:latest as base
+FROM golang:latest AS base
+
+ARG VERSION
+ARG REVISION
 
 WORKDIR /usr/src/app
 
 COPY . .
 RUN go mod download && go mod verify
-RUN CGO_ENABLED=0 go build -o /chaturbate-dvr .
+RUN CGO_ENABLED=0 go build -ldflags "-X main.version=${VERSION} -X main.revision=${REVISION}" -o /chaturbate-dvr .
 
 FROM gcr.io/distroless/static-debian12
+
+# If you want to pass the version and revision to the image as environment variables...
+# ENV APP_VERSION=${VERSION}
+# ENV APP_REVISION=${REVISION}
 
 WORKDIR /usr/src/app
 

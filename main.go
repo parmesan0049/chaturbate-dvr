@@ -14,6 +14,12 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var (
+	// These variables will be set during build via ldflags
+	version  = "dev"
+	revision = "unknown"
+)
+
 const logo = `
  ██████╗██╗  ██╗ █████╗ ████████╗██╗   ██╗██████╗ ██████╗  █████╗ ████████╗███████╗
 ██╔════╝██║  ██║██╔══██╗╚══██╔══╝██║   ██║██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝██╔════╝
@@ -31,7 +37,7 @@ const logo = `
 func main() {
 	app := &cli.App{
 		Name:    "chaturbate-dvr",
-		Version: "1.0.7",
+		Version: version,
 		Usage:   "Records your favorite Chaturbate stream 😎🫵",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -107,6 +113,12 @@ func main() {
 
 func start(c *cli.Context) error {
 	fmt.Println(logo)
+	fmt.Printf("Application Version: %s\n", version)
+	fmt.Printf("Git Revision: %s\n", revision)
+	// You can also access the environment variables if needed
+	// if envVersion := os.Getenv("APP_VERSION"); envVersion != "" {
+	//     fmt.Printf("Version from ENV: %s\n", envVersion)
+	// }
 
 	//if c.String("gui") == "web" {
 	if c.String("username") == "" {
