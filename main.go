@@ -40,18 +40,6 @@ func main() {
 				Usage:   "channel username to record",
 				Value:   "",
 			},
-			&cli.StringFlag{
-				Name:    "gui-username",
-				Aliases: []string{"gui-u"},
-				Usage:   "username for auth web (optional)",
-				Value:   "",
-			},
-			&cli.StringFlag{
-				Name:    "gui-password",
-				Aliases: []string{"gui-p"},
-				Usage:   "password for auth web (optional)",
-				Value:   "",
-			},
 			&cli.IntFlag{
 				Name:    "framerate",
 				Aliases: []string{"f"},
@@ -160,8 +148,8 @@ func startWeb(c *cli.Context) error {
 		log.Fatalln(err)
 	}
 
-	guiUsername := c.String("gui-username")
-	guiPassword := c.String("gui-password")
+	guiUsername := os.Getenv("GUI_USERNAME")
+	guiPassword := os.Getenv("GUI_PASSWORD")
 
 	logLevel := c.String("log-level")
 
