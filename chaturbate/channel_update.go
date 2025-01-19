@@ -3,6 +3,7 @@ package chaturbate
 type Update struct {
 	Username        string `json:"username"`
 	Log             string `json:"log"`
+	IsFavorite      bool   `json:"is_favorite"`
 	IsPaused        bool   `json:"is_paused"`
 	IsOnline        bool   `json:"is_online"`
 	IsStopped       bool   `json:"is_stopped"`

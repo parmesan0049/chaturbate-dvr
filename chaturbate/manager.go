@@ -32,6 +32,7 @@ type Config struct {
 	SplitDuration      int
 	SplitFilesize      int
 	Interval           int
+	IsFavorite         bool
 }
 
 // Manager
@@ -87,6 +88,40 @@ func (m *Manager) DeleteChannel(username string) error {
 	return nil
 }
 
+// UpdateChannel
+func (m *Manager) UpdateChannel(username string, resolution int, framerate int, isFavorite bool) error {
+	v, ok := m.Channels[username]
+	if !ok {
+		return ErrChannelNotFound
+	}
+	v.IsFavorite = isFavorite
+	v.Resolution = resolution
+	v.Framerate = framerate
+
+	go func() {
+		for update := range v.UpdateChannel {
+			for _, v := range m.Updates {
+				if v != nil {
+					v <- update
+				}
+			}
+		}
+	}()
+	v.log(LogTypeInfo, "channel updated")
+
+	// if any values have changed that affects recording, stop and restart the channel
+	updated := false
+	if v.Resolution != resolution || v.Framerate != framerate {
+		updated = true
+	}
+
+	if updated {
+		v.Pause()
+		go v.Run()
+	}
+	return nil
+}
+
 // CreateChannel
 func (m *Manager) CreateChannel(conf *Config) error {
 	_, ok := m.Channels[conf.Username]
@@ -106,6 +141,7 @@ func (m *Manager) CreateChannel(conf *Config) error {
 		SplitDuration:      conf.SplitDuration,
 		SegmentFilesize:    0,
 		SplitFilesize:      conf.SplitFilesize,
+		IsFavorite:         false,
 		IsOnline:           false,
 		IsPaused:           false,
 		isStopped:          false,
@@ -179,6 +215,7 @@ func (m *Manager) SaveChannels() error {
 			SplitDuration:      v.SplitDuration,
 			SplitFilesize:      v.SplitFilesize,
 			Interval:           v.Interval,
+			IsFavorite:         v.IsFavorite,
 		})
 	}
 	b, err := json.MarshalIndent(configs, "", "    ")

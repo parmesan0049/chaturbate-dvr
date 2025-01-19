@@ -168,6 +168,21 @@ function data() {
       });
     },
 
+    // updateChannel
+    async updateChannel(channel) {
+      await this.call("update_channel", {
+        username: channel.username,
+        is_favorite: channel.is_favorite,
+        resolution: parseInt(channel.resolution),
+        // resolution_fallback: this.form_data.resolution_fallback,
+        framerate: parseInt(channel.framerate),
+        // filename_pattern: this.form_data.filename_pattern,
+        // split_filesize: parseInt(this.form_data.split_filesize),
+        // split_duration: parseInt(this.form_data.split_duration),
+        // interval: parseInt(this.form_data.interval),
+      });
+    },
+
     // deleteChannel
     async deleteChannel(username) {
       if (!confirm(`Are you sure you want to delete the channel "${username}"?`)) {
@@ -226,6 +241,11 @@ function data() {
         }
       }
       this.is_updating_channels = false;
+    },
+
+    toggleFavorite(channel) {
+      channel.is_favorite = !channel.is_favorite;
+      this.updateChannel(channel)
     },
 
     // listenUpdate

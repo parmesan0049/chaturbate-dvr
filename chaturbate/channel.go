@@ -34,6 +34,7 @@ type Channel struct {
 	SplitDuration      int // Minutes
 	SegmentFilesize    int // Bytes
 	SplitFilesize      int // MB
+	IsFavorite         bool
 	IsOnline           bool
 	IsPaused           bool
 	isStopped          bool

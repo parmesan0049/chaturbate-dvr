@@ -351,7 +351,13 @@
 
           <!-- Right Section -->
           <div class="ts-content is-padded has-break-all" style="flex: 1; min-width: 300px">
-            <div class="ts-text is-description is-uppercased">Information</div>
+            <div class="ts-grid is-spaced-between">
+              <div class="ts-text is-description is-uppercased">Information</div>
+              <div class="ts-wrap is-end-aligned">
+                <span class="ts-icon is-heart-icon" style="color: var(--ts-negative-400)"
+                  :class="{ 'is-regular': !channel.is_favorite }" x-on:click="toggleFavorite(channel)"></span>
+              </div>
+            </div>
 
             <!-- Info: Channel URL -->
             <div class="ts-grid has-top-spaced-large">
@@ -385,6 +391,7 @@
             <!-- / Info: Filename -->
 
             <!-- Info: Resolution / Framerate -->
+            <!-- TODO: Add possibility to change resolution & framerate while stream is offline -->
             <div class="ts-grid has-top-spaced">
               <div class="column has-leading-none" style="width: 16px">
                 <span class="ts-icon is-film-icon"></span>

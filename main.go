@@ -184,6 +184,7 @@ func startWeb(c *cli.Context) error {
 	authorizedApi.POST("/get_channel", handler.NewGetChannelHandler(m, c).Handle)
 	authorizedApi.POST("/create_channel", handler.NewCreateChannelHandler(m, c).Handle)
 	authorizedApi.POST("/list_channels", handler.NewListChannelsHandler(m, c).Handle)
+	authorizedApi.POST("/update_channel", handler.NewUpdateChannelHandler(m, c).Handle)
 	authorizedApi.POST("/delete_channel", handler.NewDeleteChannelHandler(m, c).Handle)
 	authorizedApi.POST("/pause_channel", handler.NewPauseChannelHandler(m, c).Handle)
 	authorizedApi.POST("/resume_channel", handler.NewResumeChannelHandler(m, c).Handle)
