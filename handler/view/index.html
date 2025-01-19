@@ -308,7 +308,7 @@
       <!-- Channel -->
       <template x-for="channel in paginatedChannels" :key="channel.username">
         <!-- <div class="ts-box is-horizontal"> -->
-        <div class="ts-box is-horizontal" :class="{
+        <div class="ts-box tablet+:is-horizontal" :class="{
                                 'is-positive is-top-indicated': channel.is_online && !channel.is_paused,
                                 'is-negative is-top-indicated': !channel.is_online && !channel.is_paused,
                                 'is-top-indicated': channel.is_paused
