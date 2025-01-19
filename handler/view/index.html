@@ -241,7 +241,7 @@
       <div class="ts-divider is-center-text is-section">
         <div class="column">
           <div class="ts-wrap is-center-aligned">
-            <div class="ts-selection">
+            <div class="ts-selection mobile:is-small">
               <label class="item">
                 <input type="radio" name="filter" value="ALL" x-model="recording_filter" />
                 <div class="text">ALL (<span x-text="channels_all.length"></span>)</div>
@@ -276,8 +276,8 @@
 
     <!-- Search Bar -->
     <template x-if="channels_all.length > 0">
-      <div class="ts-grid is-end-aligned">
-        <div class="column is-4-wide">
+      <div class="ts-grid is-end-aligned mobile:has-bottom-spaced-small">
+        <div class="column is-4-wide mobile:is-16-wide">
           <div class="ts-input">
             <input type="text" placeholder="Search" x-model="search_query" />
           </div>
@@ -288,8 +288,8 @@
 
     <!-- Pagination Controls -->
     <template x-if="channels_all.length > 0">
-      <div class="ts-wrap is-center-aligned">
-        <div class="ts-pagination has-bottom-spaced">
+      <div class="ts-wrap is-center-aligned has-bottom-spaced mobile:has-bottom-spaced-small">
+        <div class="ts-pagination mobile:is-small">
           <a class="item is-first" x-on:click="goToPage(1)" :class="{ 'is-disabled': currentPage === 1 }">First</a>
           <template x-for="page in totalPages" :key="page">
             <a class="item" x-on:click="goToPage(page)" :class="{ 'is-active': currentPage === page }"
@@ -316,7 +316,7 @@
           <!-- Left Section -->
           <div class="ts-content is-padded" style="flex: 1.25; display: flex; flex-direction: column">
             <!-- Header -->
-            <div class="ts-grid is-middle-aligned">
+            <div class="ts-grid is-middle-aligned mobile:is-stacked">
               <div class="column is-fluid">
                 <div class="ts-header">
                   <span x-text="channel.username"></span>
