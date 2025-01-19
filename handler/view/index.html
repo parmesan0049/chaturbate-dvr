@@ -278,8 +278,11 @@
     <template x-if="channels_all.length > 0">
       <div class="ts-grid is-end-aligned mobile:has-bottom-spaced-small">
         <div class="column is-4-wide mobile:is-16-wide">
-          <div class="ts-input">
+          <div class="ts-input is-end-icon">
             <input type="text" placeholder="Search" x-model="search_query" />
+            <template x-if="search_query !== ''">
+              <span class="ts-icon is-circle-xmark-icon" x-on:click="search_query=''"></span>
+            </template>
           </div>
         </div>
       </div>
