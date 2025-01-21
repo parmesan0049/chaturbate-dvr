@@ -81,8 +81,8 @@ function data() {
     },
 
     // error
-    error() {
-      alert("Error occurred, please refresh the page if something is wrong.");
+    error(message) {
+      alert(message || "Error occurred, please refresh the page if something is wrong.");
     },
 
     //
@@ -93,7 +93,12 @@ function data() {
           method: "POST",
         });
         if (resp.status !== 200) {
-          this.error();
+          const errorResponse = await resp.json();
+          if (errorResponse.error) {
+            this.error(errorResponse.error);
+          } else {
+            this.error();
+          }
           return [null, true];
         }
         return [await resp.json(), false];

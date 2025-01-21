@@ -62,7 +62,7 @@ func (h *CreateChannelHandler) Handle(c *gin.Context) {
 			SplitFilesize:      req.SplitFilesize,
 			Interval:           req.Interval,
 		}); err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 	}
