@@ -1,9 +1,11 @@
 package chaturbate
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"os"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/urfave/cli/v2"
@@ -15,11 +17,12 @@ const (
 )
 
 var (
-	ErrChannelNotFound  = errors.New("channel not found")
-	ErrChannelExists    = errors.New("channel already exists")
-	ErrChannelNotPaused = errors.New("channel not paused")
-	ErrChannelIsPaused  = errors.New("channel is paused")
-	ErrListenNotFound   = errors.New("listen not found")
+	ErrChannelNotFound    = errors.New("channel not found")
+	ErrChannelExists      = errors.New("channel already exists")
+	ErrChannelNotPaused   = errors.New("channel not paused")
+	ErrChannelIsPaused    = errors.New("channel is paused")
+	ErrChannelBlacklisted = errors.New("channel is blacklisted")
+	ErrListenNotFound     = errors.New("listen not found")
 )
 
 // Config
@@ -122,8 +125,41 @@ func (m *Manager) UpdateChannel(username string, resolution int, framerate int, 
 	return nil
 }
 
+// CleanChannelName removes leading and trailing slashes from the given channel name.
+// It takes a string `name` as input and returns a string with the slashes trimmed.
+func CleanChannelName(name string) string {
+	return strings.Trim(name, "/")
+}
+
+func IsBlacklisted(username string) (bool, error) {
+	file, err := os.Open("blacklist.txt")
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		if CleanChannelName(strings.TrimSpace(scanner.Text())) == CleanChannelName(username) {
+			return true, nil
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return false, err
+	}
+	return false, nil
+}
+
 // CreateChannel
 func (m *Manager) CreateChannel(conf *Config) error {
+	blacklisted, err := IsBlacklisted(conf.Username)
+	if err != nil {
+		return err
+	}
+	if blacklisted {
+		return ErrChannelBlacklisted
+	}
+
 	_, ok := m.Channels[conf.Username]
 	if ok {
 		return ErrChannelExists
